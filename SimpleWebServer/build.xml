@@ -1,0 +1,31 @@
+<project name="SimpleWebServer" basedir=".">
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="bin" location="bin"/>
+  <property name="res" location="res"/>
+  
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+  
+  <target name="build">
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source">
+  <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="run" depends="compile"
+        description="run the program">
+        <java classname="edu.nmsu.cs.webserver.WebServer" classpath="${bin}"></java>
+  
+  <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+  <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+  </target>
+
+</project>
