@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -55,6 +56,7 @@ public class WebWorker implements Runnable
 	 **/
 	public void run()
 	{
+		String fileType = null;
 		
 		String htmlPage;
 		System.err.println("Handling connection...");
@@ -63,21 +65,30 @@ public class WebWorker implements Runnable
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 
-			// CHANGE STUFF HERE
 			htmlPage = readHTTPRequest(is);
 			File file = new File(htmlPage);
 			
-			writeHTTPHeader(os, file, "text/html");
-			
-			if (htmlPage.toLowerCase().endsWith("html")) {
-				
-				writeContent(os, file);
+			if (htmlPage.endsWith("html")) {
+				fileType="html";
+				writeHTTPHeader(os, file, "text/html");
 			}
-					
+			else if (htmlPage.endsWith("jpg")) {
+				fileType="jpg";
+				writeHTTPHeader(os, file, "image/jpg");
+			}
+			else if (htmlPage.endsWith("png")) {
+				fileType="png";
+				writeHTTPHeader(os, file, "image/png");
+			}
+			else if (htmlPage.endsWith("gif")) {
+				fileType="gif";
+				writeHTTPHeader(os, file, "image/gif");
+			}
+			
+			writeContent(os, fileType, file);
+		
 			os.flush();
 			socket.close();
-			
-			
 		}
 		catch (Exception e)
 		{
@@ -107,7 +118,9 @@ public class WebWorker implements Runnable
 					parsedLine = line.substring(5);
 					if (parsedLine.contains(" "))
 						parsedLine = parsedLine.substring(0, parsedLine.indexOf(" "));
-				}	
+					System.out.println("\n*" + parsedLine + "*\n");
+				}
+				
 				System.err.println("Request line: (" + line + ")");
 				if (line.length() == 0)
 					break;
@@ -137,12 +150,8 @@ public class WebWorker implements Runnable
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
 		if (file.exists())
 			os.write("HTTP/1.1 200 OK\n".getBytes());
-		else {
+		else
 			os.write("HTTP/1.1 404 Not Found\n".getBytes());
-			os.write("<html><head></head><body>\n".getBytes());
-			os.write("<h3>404 Not Found</h3>\n".getBytes());
-			os.write("</body></html>\n".getBytes());
-			}
 		
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
@@ -164,20 +173,34 @@ public class WebWorker implements Runnable
 	 * @param os
 	 *          is the OutputStream object to write to
 	 **/
-	private void writeContent(OutputStream os, File file) throws Exception
+	private void writeContent(OutputStream os, String fileType, File file) throws Exception
 	{
-		if (file.exists()) {
-			BufferedReader input = new BufferedReader(new FileReader(file));
-			try {
-				String readLine;
-				while ((readLine = input.readLine()) != null) {
-					os.write(readLine.getBytes());
-				}	
-				input.close();
+
+		if (fileType=="html") {
+			if (file.exists() && !file.isDirectory()) {
+				BufferedReader input = new BufferedReader(new FileReader(file));
+				try {
+					String readLine;
+					while ((readLine = input.readLine()) != null) {
+						os.write(readLine.getBytes());
+					}	
+					input.close();
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+		}
+		
+		else if (fileType=="jpg") {
+			byte[] imageToBytes = Files.readAllBytes(file.toPath());
+			os.write(imageToBytes);
+		}
+		
+		else {
+			os.write("<html><head></head><body>\n".getBytes());
+			os.write("<h3>404 Not Found</h3>\n".getBytes());
+			os.write("</body></html>\n".getBytes());
 		}
 		
 	}
