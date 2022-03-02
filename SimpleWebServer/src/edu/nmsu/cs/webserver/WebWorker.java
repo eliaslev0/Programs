@@ -106,10 +106,10 @@ public class WebWorker implements Runnable
 		String line;
 		String parsedLine = null;
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
-		while (true)
-		{
-			try
-			{
+		
+		// parse the line and return it as a string
+		while (true) {
+			try {
 				while (!r.ready())
 					Thread.sleep(1);
 				line = r.readLine();
@@ -125,8 +125,7 @@ public class WebWorker implements Runnable
 				if (line.length() == 0)
 					break;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				System.err.println("Request error: " + e);
 				break;
 			}
@@ -175,7 +174,8 @@ public class WebWorker implements Runnable
 	 **/
 	private void writeContent(OutputStream os, String fileType, File file) throws Exception
 	{
-
+		
+		// if working with an html file, go through and print each line individually
 		if (fileType=="html") {
 			if (file.exists() && !file.isDirectory()) {
 				BufferedReader input = new BufferedReader(new FileReader(file));
@@ -192,11 +192,13 @@ public class WebWorker implements Runnable
 			}
 		}
 		
-		else if (fileType=="jpg") {
+		// if working with an image or gif
+		else if (fileType=="jpg" || fileType=="png" || fileType=="gif") {
 			byte[] imageToBytes = Files.readAllBytes(file.toPath());
 			os.write(imageToBytes);
 		}
 		
+		// 404 not found
 		else {
 			os.write("<html><head></head><body>\n".getBytes());
 			os.write("<h3>404 Not Found</h3>\n".getBytes());
