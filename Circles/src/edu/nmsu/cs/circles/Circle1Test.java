@@ -35,10 +35,63 @@ public class Circle1Test
 		System.out.println("\nTest finished.");
 	}
 
-	//
-	// Test a simple positive move
-	//
-	@Test
+	public void intersectNoIntersection() {
+		System.out.println("Testing intersectNoIntersection: ");
+
+		Circle1 firstCircle = new Circle1(0, 50, 10);
+		Circle1 secondCircle = new Circle1(0, 0, 5);
+		Assert.assertFalse(firstCircle.intersects(secondCircle));
+		Assert.assertFalse(secondCircle.intersects(firstCircle));
+
+		firstCircle = new Circle1(1, 10, 2.99);
+		secondCircle = new Circle1(1, 5, 2);
+		Assert.assertFalse(firstCircle.intersects(secondCircle));
+		Assert.assertFalse(secondCircle.intersects(firstCircle));
+	}
+
+	public void intersectCompleteOverlap() {
+		System.out.println("Testing intersectCompleteOverlap: ");
+
+		Circle1 firstCircle = new Circle1(0, 0, 5);
+		Circle1 secondCircle = new Circle1(0, 0, 5);
+		Assert.assertTrue(firstCircle.intersects(secondCircle));
+		Assert.assertTrue(secondCircle.intersects(firstCircle));
+
+	}
+
+	public void intersectAtOnePoint() {
+		System.out.println("Testing intersectCompleteOverlap: ");
+
+		Circle1 firstCircle = new Circle1(0, 0, 3);
+		Circle1 secondCircle = new Circle1(7, 0, 4);
+		Assert.assertTrue(firstCircle.intersects(secondCircle));
+		Assert.assertTrue(secondCircle.intersects(firstCircle));
+
+	}
+
+	public void intersectMultiplePoints() {
+		System.out.println("Running test: intersectMultiplePoints");
+		
+		Circle1 circleA = new Circle1(0,0,10); 
+		Circle1 circleB = new Circle1(10,0,10);
+		Assert.assertTrue(circleA.intersects(circleB));
+		Assert.assertTrue(circleB.intersects(circleA));
+		
+		circleA = new Circle1(0,0,10); 
+		circleB = new Circle1(0,10,10);
+		Assert.assertTrue(circleA.intersects(circleB));
+		Assert.assertTrue(circleB.intersects(circleA));
+	}
+	
+	public void intersectSmallerCircleInside() {
+		System.out.println("Running test: smallerCircleInside()");
+		
+		Circle1 circleA = new Circle1(0,0,10); 
+		Circle1 circleB = new Circle1(0,0,5);
+		Assert.assertTrue(circleA.intersects(circleB));
+		Assert.assertTrue(circleB.intersects(circleA));
+	}
+
 	public void simpleMove()
 	{
 		Point p;
