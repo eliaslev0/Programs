@@ -62,7 +62,7 @@
         </java>
     </target>
 
-    <target name="test" depends="Circle1Test, Circle2Test" description="runs JUnit on CircleTest1 and CircleTest2">
+    <target name="test" depends="compile, Circle1Test, Circle2Test" description="runs JUnit on CircleTest1 and CircleTest2">
 
 
 </project>
